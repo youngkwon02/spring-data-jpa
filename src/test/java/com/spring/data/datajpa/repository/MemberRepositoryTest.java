@@ -280,4 +280,10 @@ class MemberRepositoryTest {
         // 여기서 setter 등을 통해 update를 해도 무시됨 (QueryHint에서 readonly 처리를 했기 때문)
         // 적은 비중의 성능 향상
     }
+
+    @Test
+    public void callCustom() {
+        List<Member> result = memberRepository.findMemberCustom();
+        System.out.println("result = " + result);
+    }
 }
