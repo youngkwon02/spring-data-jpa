@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,9 @@ class MemberRepositoryTest {
 
     @Autowired
     TeamRepository teamRepository;
+
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void testMember() {
@@ -212,5 +217,28 @@ class MemberRepositoryTest {
         assertThat(slice.getNumber()).isEqualTo(0); // 현재 페이지
         assertThat(slice.isFirst()).isTrue();
         assertThat(slice.hasNext()).isTrue();
+    }
+
+    @Test
+    public void bulkUpdate() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        // when
+        int resultCount = memberRepository.bulkAgePlus(20);
+//        em.flush();
+//        em.clear(); // bulk연산은 DB에 직접 반영하기 때문에 PersistenceContext flush and clear
+        // 혹은 Modifying annotation에 clearAutomatically 속성 부여
+
+        List<Member> member5List = memberRepository.findListByUsername("member5");
+        Member member5 = member5List.get(0);
+        System.out.println("member5 = " + member5);
+
+        // then
+        assertThat(resultCount).isEqualTo(3);
     }
 }
