@@ -259,14 +259,25 @@ class MemberRepositoryTest {
         em.clear();
 
         // when
-
         List<Member> members = memberRepository.findAll();
         for (Member member : members) {
             System.out.println("member = " + member.getUsername());
             System.out.println("member.teamClass = " + member.getTeam().getClass());
             System.out.println("member.team = " + member.getTeam().getName());
         }
+    }
 
-        // then
+    @Test
+    public void queryHint() {
+        // given
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        // 여기서 setter 등을 통해 update를 해도 무시됨 (QueryHint에서 readonly 처리를 했기 때문)
+        // 적은 비중의 성능 향상
     }
 }
